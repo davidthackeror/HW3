@@ -162,8 +162,15 @@ class TrominoTiling {
                               int startCol, int endCol ) {
    
       boolean hasForbidden = false;  // assume no forbidden
-      
-	  // YOUR CODE GOES HERE
+
+      for (int i = startRow; i < endRow; i++) {
+         for (int j = startCol; j < endCol; j++) {
+            if (this.trominoBoard[i][j]) {
+               hasForbidden = true;
+               break;
+            }
+         }
+      }
 	  
       return hasForbidden;  // return results
       
