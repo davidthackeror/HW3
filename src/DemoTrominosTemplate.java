@@ -18,7 +18,7 @@ public class DemoTrominosTemplate {
     */
    public static void main(String[] args) {
    
-      int SIZE = 32;    // must be a power of 2
+      int SIZE = 4;    // must be a power of 2
       
       // randomly place the forbidden tile
       
@@ -188,9 +188,38 @@ class TrominoTiling {
                            rand.nextInt(255),rand.nextInt(255));
  
       int size = (endRow+1)-startRow;  // determine sub-grid size
-           
-	  // YOUR CODE CODES HERE
-	  
-   } // end doTiling()
+
+//      if (subArray.dimension == 2) {
+//         place tromino in the three free cells
+      if((endRow-startRow)+(endCol- startCol) == 2){
+         for (int i = 0; i < endRow-startRow + 1; i++) {
+            for (int j = 0; j < endCol-startCol + 1; j++) {
+               if (!trominoBoard[startRow+i][startRow+j]){
+                  g.setColor(trominoColor);
+                  g.fillRect(cellSize*(startRow+i), cellSize*(startCol+j), cellSize, cellSize);
+                  panel.copyGraphicsToScreen();
+               }
+            }
+         }
+      }
+      else{
+
+      }
+//      } else {
+//         for each of four quarter subArrays {
+//            create next quarter subArray
+//            if (quarterSubArray contains a forbidden cell) {
+//               placeTrominos(array, quarterSubArray)
+//            } else {
+//               put a forbidden cell into the quarterSubArray where it connects to the others
+//               placeTrominos(array, quarterSubArray)
+//               replace the added forbidden cell with part of a new tromino
+//            }
+//         }
+//      }
+//   }
+
+
+} // end doTiling()
    
 } // end TrominoTiling class
