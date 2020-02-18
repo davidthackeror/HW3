@@ -18,7 +18,7 @@ public class DemoTrominosTemplate {
     */
    public static void main(String[] args) {
    
-      int SIZE = 4;    // must be a power of 2
+      int SIZE = 32;    // must be 4 power of 2
       
       // randomly place the forbidden tile
       
@@ -107,7 +107,7 @@ class TrominoTiling {
     *
     * @throws - IllegalArgumentException if location is not on the board
     */    
-   void setForbiddenCell( int row, int col ) {
+   void setForbiddenCellInit( int row, int col ) {
       
       if ( (row < 0) || (row >= this.getSize()) ) {
          throw new IllegalArgumentException(
@@ -118,9 +118,26 @@ class TrominoTiling {
          throw new IllegalArgumentException(
                            "Forbidden col value must be on the board.");
       }
-         
-      this.trominoBoard[row][col] = true;  // set true for forbidden
+
+      this.trominoBoard[0][0] = true;  // set true for forbidden
+      System.out.println(0 + "," + 0);
       
+   } // end setForbiddenCell()
+
+   void setForbiddenCell( int row, int col ) {
+
+      if ( (row < 0) || (row >= this.getSize()) ) {
+         throw new IllegalArgumentException(
+                 "Forbidden row value must be on the board.");
+      }
+
+      if ( (col < 0) || (col >= this.getSize()) ) {
+         throw new IllegalArgumentException(
+                 "Forbidden col value must be on the board.");
+      }
+
+      this.trominoBoard[row][col] = true;  // set true for forbidden
+
    } // end setForbiddenCell()
       
    /***********************************************************************
@@ -163,8 +180,8 @@ class TrominoTiling {
    
       boolean hasForbidden = false;  // assume no forbidden
 
-      for (int i = startRow; i < endRow; i++) {
-         for (int j = startCol; j < endCol; j++) {
+      for (int i = startRow; i <= endRow; i++) {
+         for (int j = startCol; j <= endCol; j++) {
             if (this.trominoBoard[i][j]) {
                hasForbidden = true;
                break;
@@ -175,7 +192,8 @@ class TrominoTiling {
       return hasForbidden;  // return results
       
    } // end containsForbidden()
-   
+
+
    /***********************************************************************
     * doTiling() - main recursive method that implements the divide-and-
     *    conquer algorithm for doing the tiling.
@@ -183,20 +201,21 @@ class TrominoTiling {
    void doTiling( int startRow, int endRow, int startCol, int endCol ) {
    
       // set a random color for this tromino
-      
-      Color trominoColor = new Color(rand.nextInt(255),
-                           rand.nextInt(255),rand.nextInt(255));
+      int halfRow = (startRow + endRow)/2;
+      int halfCol = (startCol + endCol)/2;
+      Color trominoColor = new Color(rand.nextInt(250),
+                           rand.nextInt(250),rand.nextInt(250));
  
       int size = (endRow+1)-startRow;  // determine sub-grid size
 
 //      if (subArray.dimension == 2) {
 //         place tromino in the three free cells
-      if((endRow-startRow)+(endCol- startCol) == 2){
-         for (int i = 0; i < endRow-startRow + 1; i++) {
-            for (int j = 0; j < endCol-startCol + 1; j++) {
-               if (!trominoBoard[startRow+i][startRow+j]){
+      if(size == 2){
+         for (int i = startRow; i <= endRow; i++) {
+            for (int j = startCol; j <= endCol; j++) {
+               if (!trominoBoard[i][j]){
                   g.setColor(trominoColor);
-                  g.fillRect(cellSize*(startRow+i), cellSize*(startCol+j), cellSize, cellSize);
+                  g.fillRect(cellSize * (i), cellSize * (j), cellSize, cellSize);
                   panel.copyGraphicsToScreen();
                }
             }
@@ -204,22 +223,78 @@ class TrominoTiling {
       }
       else{
 
-      }
-//      } else {
-//         for each of four quarter subArrays {
-//            create next quarter subArray
-//            if (quarterSubArray contains a forbidden cell) {
-//               placeTrominos(array, quarterSubArray)
-//            } else {
-//               put a forbidden cell into the quarterSubArray where it connects to the others
-//               placeTrominos(array, quarterSubArray)
-//               replace the added forbidden cell with part of a new tromino
-//            }
-//         }
-//      }
-//   }
 
+         //top left
+
+         if(containsForbidden(startRow,halfRow,startCol, halfCol)){
+            doTiling(startRow,halfRow,startCol, halfCol);
+         }
+         else{
+            trominoBoard[halfRow][halfCol] = true;
+            doTiling(startRow, halfRow, startCol, halfCol);
+            trominoBoard[halfRow][halfCol] = false;
+            g.setColor(trominoColor);
+            g.fillRect(cellSize * (halfRow), cellSize * (halfCol), cellSize, cellSize);
+            panel.copyGraphicsToScreen();
+         }
+
+         if(containsForbidden(startRow,halfRow,halfCol + 1, endCol)){
+            doTiling(startRow,halfRow,halfCol + 1, endCol);
+         }
+         else{
+            trominoBoard[halfRow][halfCol + 1] = true;
+            doTiling(startRow,halfRow,halfCol + 1, endCol);
+            trominoBoard[halfRow][halfCol + 1] = false;
+            g.setColor(trominoColor);
+            g.fillRect(cellSize * (halfRow), cellSize * (halfCol + 1), cellSize, cellSize);
+            panel.copyGraphicsToScreen();
+         }
+         if(containsForbidden(halfRow + 1,endRow,halfCol + 1, endCol)){
+            doTiling(halfRow + 1,endRow,halfCol + 1, endCol);
+         }
+         else{
+            trominoBoard[halfRow + 1][halfCol + 1] = true;
+            doTiling(halfRow + 1,endRow,halfCol + 1, endCol);
+            trominoBoard[halfRow + 1][halfCol + 1] = false;
+            g.setColor(trominoColor);
+            g.fillRect(cellSize * (halfRow + 1), cellSize * (halfCol + 1), cellSize, cellSize);
+            panel.copyGraphicsToScreen();
+         }
+         if(containsForbidden(halfRow + 1,endRow,startCol, halfCol)){
+            doTiling(halfRow + 1,endRow,startCol, halfCol);
+         }
+         else{
+            trominoBoard[halfRow + 1][halfCol] = true;
+            doTiling(halfRow + 1,endRow,startCol, halfCol);
+            trominoBoard[halfRow + 1][halfCol] = false;
+            g.setColor(trominoColor);
+            g.fillRect(cellSize * (halfRow + 1), cellSize * (halfCol), cellSize, cellSize);
+            panel.copyGraphicsToScreen();
+         }
+//         if(containsForbidden(halfRow + 1,endRow,startCol, halfCol)){
+//            doTiling(halfRow + 1,endRow,startCol, halfCol);
+//         }
+//         else{
+//            trominoBoard[halfRow][halfCol + 1] = true;
+//            doTiling(halfRow + 1,endRow,startCol, halfCol);
+//            trominoBoard[halfRow][halfCol + 1] = false;
+//            g.setColor(Color.YELLOW);
+//            g.fillRect(cellSize * (halfRow), cellSize * (halfCol + 1), cellSize, cellSize);
+//            panel.copyGraphicsToScreen();
+//         }
+//         if(containsForbidden(halfRow + 1,endRow,halfCol + 1, endCol)){
+//            doTiling(halfRow + 1,endRow,halfCol + 1, endCol);
+//         }
+//         else{
+//            trominoBoard[halfRow + 1][halfCol + 1] = true;
+//            doTiling(halfRow + 1,endRow,halfCol + 1, endCol);
+//            trominoBoard[halfRow + 1][halfCol + 1] = false;
+//            g.setColor(Color.YELLOW);
+//            g.fillRect(cellSize * (halfRow + 1), cellSize * (halfCol + 1), cellSize, cellSize);
+//            panel.copyGraphicsToScreen();
+//         }
+      }
 
 } // end doTiling()
-   
+
 } // end TrominoTiling class
